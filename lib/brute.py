@@ -17,12 +17,18 @@ def _check(r, pwd, pattern):
 def _CsrfToken(html, csrf):
     html = re.sub('>\s+<', '><', html)
     html = html.replace('><', '>\n<')
-    input_field = re.search(
-        r'(<input(?:.*?)name=["\']{0}["\'](?:.*)>)\n'.format(csrf), html).group()
-    csrf_token = re.findall(
-        r'value=(?P<quote>["\'])(.*?)(?P=quote)', input_field)[0][1]
 
-    return csrf_token
+    final_csrf = {}
+    for input in  re.findall(r'(?i)<input.*?>', html):
+        csrf_name = re.search(r'(?i)name=["\'](.*?)["\']', input)
+        if csrf_name:
+            csrf_name = csrf_name.group(1)
+            if csrf_name in csrf:
+                csrf_token = re.findall(
+                    r'value=(?P<quote>["\'])(.*?)(?P=quote)', input)[0][1]
+                logging.info("hidden(%s): %s", csrf_name, csrf_token)
+                final_csrf[csrf_name] = csrf_token
+    return final_csrf
 
 
 def with_csrf(url=None, action_url=None, data=None, pwd=None, csrf_name=None, headers=None, pattern=None, timeout=None, proxy=None):
@@ -33,13 +39,12 @@ def with_csrf(url=None, action_url=None, data=None, pwd=None, csrf_name=None, he
         s.proxies = {'http': proxy, 'https': proxy}
 
     html = s.get(url)
-    csrf_token = _CsrfToken(html.text, csrf_name)
-    logging.info("hidden(%s): %s", csrf_name, csrf_token)
+    csrf_token_dict = _CsrfToken(html.text, csrf_name)
 
     s.headers["referer"] = html.url
     s.headers["Cookie"] = ';'.join(
         map(lambda x: '='.join(x), list(dict(html.cookies).items())))
-    data[csrf_name] = csrf_token
+    data.update(csrf_token_dict)
 
     r = s.post(action_url, data, timeout=timeout)
     _check(r, pwd, pattern)

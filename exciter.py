@@ -15,7 +15,8 @@ from lib import brute
 
 logging.basicConfig(format='\r[kuzuri-chan]: %(message)s', level=logging.INFO)
 LOGIN_PAGE = ["login", "session", "index", "admin",
-    'cek', "check", "panel", "dashboard", "member"]
+    'cek', "check", "panel", "dashboard", "member", 'signin'
+]
 
 def signal_handler(sig, frame):
     exit(logging.info('user interrupt'))
@@ -28,7 +29,7 @@ class LoginForm:
         logging.info('Trying to find the login form')
         self.ua = self.useragent()
         self.action = None
-        self.csrf = None
+        self.csrf = []
         self.pwfield = None
         self.data = {}
         self.headers = {}
@@ -65,11 +66,13 @@ class LoginForm:
 
             for inp in inputs:
                 csrf = re.findall(
-                    r'(?si)<input.*?name=(?P<quote>["\'])((.*(?:csrf|token|o?auth).*))(?P=quote)', inp)
-                if csrf and not self.csrf:
+                    r'(?i)name=(?P<quote>["\'])((.*(?:csrf|token).*))(?P=quote)', inp)
+
+                if csrf:
                     csrf = re.search(r'^(.+?)["\']', csrf[0][1]).groups()[0]
                     logging.info('CSRF found: %s', csrf)
-                    self.csrf = csrf
+                    self.csrf.append(csrf)
+
                 if re.search(r'(?si)type=(?P<quote>["\']).+?(?P=quote)', inp):
                     local_data = dict(re.findall(
                         r'(?si)((?:name|value|type))=["\'](.*?)["\']', inp))
@@ -90,7 +93,7 @@ class LoginForm:
                             local_data["value"] = arg.username
                         if type == "submit":
                             submit_button = True
-                        if local_data["name"] != self.csrf:
+                        if local_data["name"] not in self.csrf:
                             self.data[local_data["name"]] = local_data["value"]
             logging.info('POST data %s', self.data)
         else:
@@ -109,10 +112,10 @@ class LoginForm:
 
 
 if __name__ == '__main__':
-    parser = cli.CLI()
-    arg = parser.parse_args()
+        parser = cli.CLI()
+        arg = parser.parse_args()
 
-    try:
+#    try:
         if len(arg.password) == 1:
             arg.password = open(arg.password[0], 'r').read().splitlines()
 
@@ -150,7 +153,7 @@ if __name__ == '__main__':
                 logging.info('skipped, read timeout')
         print()
         logging.info('----> password not found <----\n')
-    except Exception as E:
-        logging.info(str(E))
+#    except Exception as E:
+ #       logging.info(str(E))
 
 
