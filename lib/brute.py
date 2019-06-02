@@ -14,20 +14,22 @@ def _check(r, pwd, pattern):
         exit(logging.info("---->  OK, password found %s  <----\n", pwd))
 
 
-def _CsrfToken(html, csrf):
+def _CsrfToken(html, csrf, action_url):
     html = re.sub('>\s+<', '><', html)
     html = html.replace('><', '>\n<')
 
     final_csrf = {}
-    for input in  re.findall(r'(?i)<input.*?>', html):
+    form = re.findall('(?si)<form.*?type=["\']password["\'].*?/form>', html)
+    for input in re.findall(r'(?i)<input.*?>', form[0]):
         csrf_name = re.search(r'(?i)name=["\'](.*?)["\']', input)
         if csrf_name:
             csrf_name = csrf_name.group(1)
             if csrf_name in csrf:
                 csrf_token = re.findall(
                     r'value=(?P<quote>["\'])(.*?)(?P=quote)', input)[0][1]
-                logging.info("hidden(%s): %s", csrf_name, csrf_token)
-                final_csrf[csrf_name] = csrf_token
+                if csrf_name not in final_csrf.keys():
+                    logging.info("hidden(%s): %s", csrf_name, csrf_token)
+                    final_csrf[csrf_name] = csrf_token
     return final_csrf
 
 
@@ -39,7 +41,7 @@ def with_csrf(url=None, action_url=None, data=None, pwd=None, csrf_name=None, he
         s.proxies = {'http': proxy, 'https': proxy}
 
     html = s.get(url)
-    csrf_token_dict = _CsrfToken(html.text, csrf_name)
+    csrf_token_dict = _CsrfToken(html.text, csrf_name, action_url)
 
     s.headers["referer"] = html.url
     s.headers["Cookie"] = ';'.join(

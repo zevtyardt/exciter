@@ -14,9 +14,6 @@ from lib import brute
 
 
 logging.basicConfig(format='\r[kuzuri-chan]: %(message)s', level=logging.INFO)
-LOGIN_PAGE = ["login", "session", "index", "admin",
-    'cek', "check", "panel", "dashboard", "member", 'signin'
-]
 
 def signal_handler(sig, frame):
     exit(logging.info('user interrupt'))
@@ -55,7 +52,7 @@ class LoginForm:
                         urlparse(r.url),
                         '/' if not _action.startswith('/') else ""
                     ) + _action
-            if re.search(r'(?i)' + '|'.join(LOGIN_PAGE), _action):
+            if re.search(r'(?si)<input.*?type=["\']password["\']', form):
                 logging.info('OK, action url %s', _action)
                 self.action = _action
                 break
