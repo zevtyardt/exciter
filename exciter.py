@@ -58,46 +58,49 @@ class LoginForm:
                 break
 
         if self.action:
-            inputs = re.findall(r'(?si)(<(?:input|button).*?>)', form)
-            submit_button = False
-
-            for inp in inputs:
-                csrf = re.findall(
-                    r'(?i)name=(?P<quote>["\'])((.*(?:csrf|token).*))(?P=quote)', inp)
-                if csrf:
-                    _csrf = re.search(r'^(.+?)["\']', csrf[0][1])
-                    if _csrf:
-                        csrf = _csrf.groups()[0]
-                    else:
-                        csrf = csrf[0][1]
-                    logging.info('CSRF found: %s', csrf)
-                    self.csrf.append(csrf)
-
-                if re.search(r'(?si)type=(?P<quote>["\']).+?(?P=quote)', inp):
-                    local_data = dict(re.findall(
-                        r'(?si)((?:name|value|type))=["\'](.*?)["\']', inp))
-                    if not local_data.get("value"):
-                        local_data["value"] = ""
-                    if local_data.get('name'):
-                        type = local_data.get("type")
-                        if type == 'submit' and submit_button or not arg.hidden_inputs and type == "hidden":
-                            continue
-                        if type == "password":
-                           self.pwfield = local_data["name"]
-                        if type in ['email', 'text', 'username']:
-                            question = type + "(" + local_data["name"] + "): "
-                            if arg.username:
-                                logging.info(question + arg.username)
-                            else:
-                                arg.username = input("[kuzuri-chan]: " + question)
-                            local_data["value"] = arg.username
-                        if type == "submit":
-                            submit_button = True
-                        if local_data["name"] not in self.csrf:
-                            self.data[local_data["name"]] = local_data["value"]
-            logging.info('POST data %s', self.data)
+            self.findInputs(form)
         else:
             exit(logging.info('no login form found on this page'))
+
+    def findInputs(self, form):
+        inputs = re.findall(r'(?si)(<(?:input|button).*?>)', form)
+        submit_button = False
+
+        for inp in inputs:
+            csrf = re.findall(
+              r'(?i)name=(?P<quote>["\'])((.*(?:csrf|token).*))(?P=quote)', inp)
+            if csrf:
+                _csrf = re.search(r'^(.+?)["\']', csrf[0][1])
+            if _csrf:
+                csrf = _csrf.groups()[0]
+            else:
+                csrf = csrf[0][1]
+            logging.info('CSRF found: %s', csrf)
+            self.csrf.append(csrf)
+
+            if re.search(r'(?si)type=(?P<quote>["\']).+?(?P=quote)', inp):
+                local_data = dict(re.findall(
+                  r'(?si)((?:name|value|type))=["\'](.*?)["\']', inp))
+                if not local_data.get("value"):
+                    local_data["value"] = ""
+                if local_data.get('name'):
+                    type = local_data.get("type")
+                    if type == 'submit' and submit_button or not arg.hidden_inputs and type == "hidden":
+                        continue
+                    if type == "password":
+                        self.pwfield = local_data["name"]
+                    if type in ['email', 'text', 'username']:
+                        question = type + "(" + local_data["name"] + "): "
+                        if arg.username:
+                            logging.info(question + arg.username)
+                        else:
+                            arg.username = input("[kuzuri-chan]: " + question)
+                        local_data["value"] = arg.username
+                    if type == "submit":
+                        submit_button = True
+                    if local_data["name"] not in self.csrf:
+                        self.data[local_data["name"]] = local_data["value"]
+        logging.info('POST data %s', self.data)
 
     def webpage(self, url):
         logging.info('starting new %s connection with UserAgent %s',
@@ -112,10 +115,10 @@ class LoginForm:
 
 
 if __name__ == '__main__':
-        parser = cli.CLI()
-        arg = parser.parse_args()
+    parser = cli.CLI()
+    arg = parser.parse_args()
 
-#    try:
+    try:
         if len(arg.password) == 1:
             arg.password = open(arg.password[0], 'r').read().splitlines()
 
@@ -153,7 +156,7 @@ if __name__ == '__main__':
                 logging.info('skipped, read timeout')
         print()
         logging.info('----> password not found <----\n')
-#    except Exception as E:
- #       logging.info(str(E))
+    except Exception as E:
+        logging.info(str(E))
 
 

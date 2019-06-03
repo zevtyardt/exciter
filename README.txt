@@ -1,8 +1,9 @@
 
 EXCITER
 ========
-  is an open source penetration testing tool that automates testing accounts to the site's login page, based on Dictionary Attack.
-  this tools will automatically search the url action and all inputs on the website which will be used to send login data to the server
+  is an open source penetration testing tool that automates testing accounts to the site's login page,
+  based on Dictionary Attack. this tools will automatically search the url action and all inputs on the
+  website which will be used to send login data to the server
 
 INSTALLATION ON LINUX
 =====================
@@ -20,3 +21,6 @@ USAGE
 =====
   $ python3 exciter.py -t https://eaxmple.com/login.php -p password list
 
+SUPPORT
+=======
+  1. publish and review in your blog
