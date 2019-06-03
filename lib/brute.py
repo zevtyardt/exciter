@@ -48,7 +48,7 @@ def with_csrf(url=None, action_url=None, data=None, pwd=None, csrf_name=None, he
         map(lambda x: '='.join(x), list(dict(html.cookies).items())))
     data.update(csrf_token_dict)
 
-    r = s.post(action_url, data, timeout=timeout)
+    r = s.post(action_url, data, timeout=timeout, cookies=html.cookies)
     _check(r, pwd, pattern)
 
 
