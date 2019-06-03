@@ -44,7 +44,7 @@ class LoginForm:
             if not _action:
                 _action = r.url
             else:
-                _action = _action[0][1]
+                _action = _action[-1][-1]
                 if _action in ("", '#') or _action.startswith('.'):
                     _action = r.url
                 elif not re.search(r'(?i)^http', _action):
