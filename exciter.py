@@ -71,12 +71,12 @@ class LoginForm:
               r'(?i)name=(?P<quote>["\'])((.*(?:csrf|token).*))(?P=quote)', inp)
             if csrf:
                 _csrf = re.search(r'^(.+?)["\']', csrf[0][1])
-            if _csrf:
-                csrf = _csrf.groups()[0]
-            else:
-                csrf = csrf[0][1]
-            logging.info('CSRF found: %s', csrf)
-            self.csrf.append(csrf)
+                if _csrf:
+                    csrf = _csrf.groups()[0]
+                else:
+                    csrf = csrf[0][1]
+                logging.info('CSRF found: %s', csrf)
+                self.csrf.append(csrf)
 
             if re.search(r'(?si)type=(?P<quote>["\']).+?(?P=quote)', inp):
                 local_data = dict(re.findall(
