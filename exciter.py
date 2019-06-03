@@ -64,9 +64,12 @@ class LoginForm:
             for inp in inputs:
                 csrf = re.findall(
                     r'(?i)name=(?P<quote>["\'])((.*(?:csrf|token).*))(?P=quote)', inp)
-
                 if csrf:
-                    csrf = re.search(r'^(.+?)["\']', csrf[0][1]).groups()[0]
+                    _csrf = re.search(r'^(.+?)["\']', csrf[0][1])
+                    if _csrf:
+                        csrf = _csrf.groups()[0]
+                    else:
+                        csrf = csrf[0][1]
                     logging.info('CSRF found: %s', csrf)
                     self.csrf.append(csrf)
 
