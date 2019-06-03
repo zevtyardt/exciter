@@ -81,7 +81,7 @@ class LoginForm:
                             continue
                         if type == "password":
                            self.pwfield = local_data["name"]
-                        if type not in ('password', 'submit', 'hidden'):
+                        if type in ['email', 'text', 'username']:
                             question = type + "(" + local_data["name"] + "): "
                             if arg.username:
                                 logging.info(question + arg.username)
