@@ -6,7 +6,6 @@ import logging
 
 logging.basicConfig(format='[kuzuri-chan]: %(message)s', level=logging.INFO)
 
-
 def _check(r, pwd, pattern):
     logging.info('return: %s', r.url)
     if re.search(pattern, r.text):
@@ -42,12 +41,12 @@ def with_csrf(url=None, action_url=None, data=None, pwd=None, csrf_name=None, he
     html = s.get(url)
     csrf_token_dict = _CsrfToken(html.text, csrf_name, action_url)
 
+    s.headers["Content-Type"] = html.headers.get("Content-Type", "application/x-www-form-urlencoded")
+    s.headers["save-data"] = html.headers.get("save-data", "on")
     s.headers["referer"] = html.url
-    s.headers["Cookie"] = ';'.join(
-        map(lambda x: '='.join(x), list(dict(html.cookies).items())))
     data.update(csrf_token_dict)
 
-    r = s.post(action_url, data, timeout=timeout, cookies=html.cookies)
+    r = s.post(action_url, data, cookies=html.cookies, timeout=timeout)
     _check(r, pwd, pattern)
 
 

@@ -5,10 +5,10 @@ import requests
 import re
 import readline
 import logging
-import time
 
 from urllib.parse import urlparse
 from removed import user_agents
+from removed import sleep
 from removed import cli
 from lib import brute
 
@@ -119,12 +119,14 @@ if __name__ == '__main__':
     arg = parser.parse_args()
 
     try:
-        if len(arg.password) == 1:
-            arg.password = open(arg.password[0], 'r').read().splitlines()
-
         flow = LoginForm()
         html = flow.webpage(arg.url)
         flow.forms(html)
+
+        if len(arg.password) == 1:
+            file_name = arg.password[0]
+            arg.password = open(file_name, 'r').read().splitlines()
+            logging.info('read %s lines from %s', len(arg.password), file_name)
 
         logging.info("starting brute force attack")
         for num, pwd in enumerate(arg.password, start=1):
@@ -151,7 +153,9 @@ if __name__ == '__main__':
                                  timeout=arg.timeout,
                                  proxy=arg.proxy,
                                  pattern=arg.regex_pattern)
-                time.sleep(arg.delay)
+                if arg.delay > 0 and num < len(arg.password):
+                    sleep.start(arg.delay)
+
             except requests.exceptions.ReadTimeout:
                 logging.info('skipped, read timeout')
         print()
