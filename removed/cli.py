@@ -7,7 +7,7 @@ def CLI():
     parser.add_argument('-p', dest='password',
                         help='password list or file name', nargs='*', required=True)
     parser.add_argument('-r', dest='regex_pattern',
-                        help='regex pattern to identify the user has been logged', default='(?i)(?:sign|log)\s*out|dashboard')
+                        help='regex pattern to identify the user has been logged', default='(?i)(?:sign|log)\s*out')
     parser.add_argument('-u', dest='username', help='username or email target')
     parser.add_argument('-d', dest='delay', help='waiting time before starting the connection', default=0)
     parser.add_argument('-t', dest='url', help='valid url, http / https protocol is required', required=True)
