@@ -15,8 +15,7 @@ def _check(r, pwd, pattern):
 
 
 def _CsrfToken(html, csrf, action_url):
-    html = re.sub('>\s+<', '><', html)
-    html = html.replace('><', '>\n<')
+    html = re.sub('>\s+<', '>\n<', html)
 
     final_csrf = {}
     form = re.findall('(?si)<form.*?type=["\']password["\'].*?/form>', html)
