@@ -1,15 +1,15 @@
 import time
-import sys
 
 
 def start(delay):
     while 1:
-        sys.stdout.write('\r[kuzuri-chan]: sleeping for %s seconds ' % delay),
-        sys.stdout.flush()
-
+        print('\r[kuzuri-chan]: sleeping for %s seconds ' % delay, end=' ')
         if delay == 0:
             print()
             break
-
         time.sleep(1)
         delay -= 1
+
+if __name__ == '__main__':
+    import sys
+    start(int(sys.argv[1]))
