@@ -21,6 +21,11 @@ USAGE
 =====
   $ python3 exciter.py -t https://eaxmple.com/login.php -p password list
 
-SUPPORT
-=======
-  1. publish and review in your blog
+CHANGELOG
+=========
+  1. add __init__.py in each folder because setuptools.find_pakages doesn't work in python3
+     now you can install this tool just by typing  pip3 install . in the exciter folder
+
+SUPPORT ME
+==========
+  1. publish and review in your blog ^^

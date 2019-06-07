@@ -7,10 +7,10 @@ import readline
 import logging
 
 from urllib.parse import urlparse
-from removed import user_agents
-from removed import sleep
-from removed import cli
-from lib import brute
+from .removed import user_agents
+from .removed import sleep
+from .removed import cli
+from .lib import brute
 
 
 logging.basicConfig(format='\r[kuzuri-chan]: %(message)s', level=logging.INFO)
@@ -113,8 +113,9 @@ class LoginForm:
     def useragent(self):
         return user_agents.random()
 
+def main():
+    global arg
 
-if __name__ == '__main__':
     parser = cli.CLI()
     arg = parser.parse_args()
 
@@ -163,4 +164,5 @@ if __name__ == '__main__':
     except Exception as E:
         logging.info(str(E))
 
-
+if __name__ == "__main__":
+    main()
