@@ -40,15 +40,15 @@ def with_csrf(url=None, action_url=None, data=None, pwd=None, csrf_name=None, he
 
     html = s.get(url)
     csrf_token_dict = _CsrfToken(html.text, csrf_name, action_url)
-
-    s.headers["Content-Type"] = html.headers.get("Content-Type", "application/x-www-form-urlencoded")
-    s.headers["save-data"] = html.headers.get("save-data", "on")
-    s.headers["referer"] = html.url
     data.update(csrf_token_dict)
+
+    s.headers["referer"] = html.url
+    s.headers["Cookie"] = ';'.join(
+      ['='.join(iii) for iii in dict(html.cookies).items()]
+    )
 
     r = s.post(action_url, data, cookies=html.cookies, timeout=timeout)
     _check(r, pwd, pattern)
-
 
 def without_csrf(action_url=None, data=None, pwd=None, headers=None, pattern=None, timeout=None, proxy=None):
     if proxy:

@@ -68,7 +68,7 @@ class LoginForm:
 
         for inp in inputs:
             csrf = re.findall(
-              r'(?i)name=(?P<quote>["\'])((.*(?:csrf|token).*))(?P=quote)', inp)
+              r'(?i)name=(?P<quote>["\'])((.*(?:csrf|t[o]?ken).*))(?P=quote)', inp)
             if csrf:
                 _csrf = re.search(r'^(.+?)["\']', csrf[0][1])
                 if _csrf:
