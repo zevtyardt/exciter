@@ -7,10 +7,16 @@ import readline
 import logging
 
 from urllib.parse import urlparse
-from .removed import user_agents
-from .removed import sleep
-from .removed import cli
-from .lib import brute
+if __name__ == '__main__':
+    from removed import user_agents
+    from removed import sleep
+    from removed import cli
+    from lib import brute
+else:
+    from .removed import user_agents
+    from .removed import sleep
+    from .removed import cli
+    from .lib import brute
 
 
 logging.basicConfig(format='\r[kuzuri-chan]: %(message)s', level=logging.INFO)
